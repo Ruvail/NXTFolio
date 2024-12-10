@@ -1,9 +1,10 @@
-
 Rails.application.routes.draw do
-
+  get 'general_info/:id/profile', to: 'general_info#profile', as: 'profile'
   # to retrive states and cities
+  get 'messages', to: 'room#index'
   get 'states/:country_id', to: 'states#index', as: 'states'
   get 'cities/:state_id', to: 'cities#index', as: 'cities'
+  post 'general_info/generate_about_me', to: 'general_info#generate_about_me', as: :generate_about_me
 
   post '/dm/:id', to: 'room#create_message'
 
@@ -21,6 +22,8 @@ Rails.application.routes.draw do
 
   get 'show_profile/destroy/:id'=> 'show_profile#destroy', :as => 'show_profile_destroy'
 
+  get 'galleries/delete/:id'=> 'galleries#delete', :as => 'galleries_delete'
+
   get 'galleries/index'
 
   get 'galleries/show' => 'galleries#show', :as => 'galleries/show'
@@ -31,6 +34,7 @@ Rails.application.routes.draw do
 
   # NXTFolio : Added in Spring 2023 for tagging feature
   post '/galleries/:id/create_tagging', to: 'galleries#create_tagging', as: 'create_tagging_gallery'
+  delete '/galleries/:id/destroy_tagging', to: 'galleries#destroy_tagging', as: 'destroy_tagging_gallery'
 
   # spring2023 add/delete images in gallery
   get '/galleries/:id/edit', to: 'galleries#edit', as: 'edit_gallery'
@@ -47,23 +51,30 @@ Rails.application.routes.draw do
   get '/galleries/:id/comments', to: 'galleries#add_comment', as: 'gallery_add_comment'
   post '/galleries/:id/comments', to: 'galleries#post_comment', as: 'gallery_post_comment'
 
+  # Winter 2024: To add tags
+  get '/galleries/:id/tags', to: 'galleries#add_tag', as: 'gallery_add_tag'
+  post '/galleries/:id/tags', to: 'galleries#create_tag', as: 'gallery_create_tag'
+
   #get 'template/create'
   #post 'template/create' => 'template#create', :as => 'template/create1'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   #devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
-  devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
+  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks",
+                                   registrations: "users/registrations",
+                                   sessions: "devise/sessions" }, 
+                    skip: [:registrations] 
   get 'general_info_list' => 'general_info#list', :as => 'general_info_list'
   get 'general_info_save' => 'general_info#save', :as => 'general_info_save'
   get 'general_info/edit' => 'general_info#edit', :as => 'general_info/edit'
   get 'general_info/edit2' => 'general_info#edit2', :as => 'general_info/edit2'
   get 'general_info/edit_travel' => 'general_info#edit_travel', :as => 'general_info/edit_travel'
+  get 'general_info/new', to: 'general_info#new', as: 'general_info_new'
   get 'general_info/new2' => 'general_info#new2', :as => 'general_info/new2'
   post 'general_info/update' => 'general_info#update', :as => 'general_info/update'
   get 'general_info/edit_profession' => 'general_info#edit_profession', :as => 'general_info/edit_profession'
   post 'general_info/update_profession' => 'general_info#update_profession', :as => 'general_info/update_profession'
   get 'general_info/profession_specific' => 'general_info#profession_specific', :as => 'general_info/profession_specific'
   post 'general_info/profession_specific' => 'general_info#profession_specific_create', :as => 'general_info/profession_specific_create'
-
   # Follow Feature
   get 'general_info/follow/:id' => 'general_info#follow'
   get 'general_info/unfollow/:id' => 'general_info#unfollow'
@@ -80,6 +91,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     get 'users', to: 'general_info#index'
+    get 'delete/:id', to: 'general_info#delete'
+    get 'toggle_access/:id', to: 'general_info#toggle_access'
     # resources :general_info, only: [:index]
   end
 
@@ -93,9 +106,13 @@ Rails.application.routes.draw do
   get 'login_info/login' => 'login_info#login', :as => 'login_info/login'
   post 'login_info/login_submit' => 'login_info#login_submit', :as => 'login_info/login_submit'
   get 'login_info/logout' => 'login_info#logout', :as => 'login_info/logout'
+  post 'login_info/new' => 'login_info#new', :as => 'login_info/new'
   post 'login_info/create' => 'login_info#create', :as => 'login_info/create'
   get 'login_info/edit' => 'login_info#edit', :as => 'login_info/edit'
   post 'login_info/update' => 'login_info#update', :as => 'login_info/update'
+  get 'unconfirmed_user/new' => 'unconfirmed_user#new', :as => 'unconfirmed_user/new'
+  post 'unconfirmed_user/verify' => 'unconfirmed_user#verify', :as => 'unconfirmed_user/verify'
+  get 'unconfirmed_user/regenerate_token' => 'unconfirmed_user#regenerate_token', :as => 'unconfirmed_user/regenerate_token'
 
 
   get 'login' => 'login_info#login', :as => 'login'
@@ -106,14 +123,17 @@ Rails.application.routes.draw do
   get 'specific_designer_list' => 'specific_designer#list', :as => 'specific_designer_list'
   get 'specific_designer/edit' => 'specific_designer#edit', :as => 'specific_designer/edit'
   post 'specific_designer/update' => 'specific_designer#update', :as => 'specific_designer/update'
+  delete 'specific_designer/destroy' => 'specific_designer#destroy', :as => 'specific_designer/destroy'
 
   get 'specific_model_list' => 'specific_model#list', :as => 'specific_model_list'
   get 'specific_model/edit' => 'specific_model#edit', :as => 'specific_model/edit'
   post 'specific_model/update' => 'specific_model#update', :as => 'specific_model/update'
+  delete 'specific_model/destroy' => 'specific_model#destroy', :as => 'specific_model/destroy'
 
   get 'specific_photographer_list' => 'specific_photographer#list', :as => 'specific_photographer_list'
   get 'specific_photographer/edit' => 'specific_photographer#edit', :as => 'specific_photographer/edit'
   post 'specific_photographer/update' => 'specific_photographer#update', :as => 'specific_photographer/update'
+  delete 'specific_photographer/destroy' => 'specific_photographer#destroy', :as => 'specific_photographer/destroy'
 
   get 'show_profile/mymodel' => 'show_profile#show_model', :as => 'show_profile_show_model'
   get 'show_profile' => 'show_profile#show_profile', :as => 'show_profile_show_profile'
@@ -134,17 +154,20 @@ Rails.application.routes.draw do
   get 'add_profession' => 'template#index', :as => 'template'
   post '/' => 'general_info#index', :as => 'general_info_index_post'
 
+  get 'application/index' => 'application#index', :as => 'application/index'
+
   get 'search_engine/show' => 'search_engine#show', :as => 'search_engine/show'
   get 'search_engine/search' => 'search_engine#search', :as => 'search_engine/search'
 
   get 'job_search/jobshow' => 'job_search#jobshow', :as => 'job_search/jobshow'
-  # get 'job_search/jobsearch' => 'job_search#jobsearch', :as => 'job_search/jobsearch'
+  #get 'job_search/jobsearch' => 'job_search#jobsearch', :as => 'job_search/jobsearch'
 
   # get 'job_info/post_job' => 'job_info#post_job', :as => 'job_info/post_job1'
   post '/job_info/post_job', to: 'job_info#post_job', as: 'job_info_post_job'
+  get 'job_info/index',   to: 'job_info#index',  as: 'job_info/index'
   get 'job_info/search', to: 'job_info#search', as: 'job_info/search'
   get 'job_info/new_job', to: 'job_info#new_job', as: 'job_info_new_job'
-  # get 'job_info/show/:id', to: 'job_info#show', as: 'job_info_show'
+  get 'job_info/show/:id', to: 'job_info#show', as: 'job_info_show'
   # delete 'job_info/:id/del(.:format)', to: 'job_info#destroy', as: 'del_job_info'
   get '/job_info/:id/del', to: 'job_info#destroy', as: 'del_job_info'
   get '/job_info/:id/visitor', to: 'job_info#visitor_show', as: 'visitor_job_info'
@@ -187,11 +210,17 @@ end
   resources :search_engine
   resources :job_search
 
+
   devise_scope :user do
+    get 'sign_up', to: 'login_info#new', as: :new_user_registration
+    post 'sign_up', to: 'login_info#create', as: :user_registration
     get 'sign_in', :to => 'devise/sessions#new', :as => :new_user_session
+    post 'sign_in', to: 'devise/sessions#create', as: :user_session
     get 'sign_out', :to => 'devise/sessions#destroy', :as => :destroy_user_session
   end
   root 'application#index'
+
+ 
 
 end
 

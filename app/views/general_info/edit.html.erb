@@ -7,7 +7,7 @@
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<link rel="shortcut icon" href="<%= asset_path "favicon.jpg"%>">
-		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="<%= asset_path "bootstrap.min.css"%>">
 		<link rel="stylesheet" href="<%= asset_path "icon.css"%>">
@@ -35,55 +35,7 @@
 		</div>
     </div>
 	<!-- THE HEADER -->
-	<header>
-
-		<div class="container-fluid custom-container">
-			<div class="row no_row row-header">
-				<div class="brand-be">
-					<a href="/">
-						<img class="logo-c active be_logo"  src="<%= asset_path "new_logo.png"%>" alt="logo">
-						<img class="logo-c be_logo" src="<%= asset_path "logo.png"%>" alt="logo2">
-						<img  class="logo-c be_logo" src="<%= asset_path "logo.png"%>" alt="logo3">
-						<img class="logo-c be_logo" src="<%= asset_path "logo.png"%>" alt="logo4">
-					</a>
-				</div>
-				<div class="header-menu-block">
-					<button class="cmn-toggle-switch cmn-toggle-switch__htx"><span></span></button>
-					<ul class="header-menu" id="one">
-						<!--<li><a href="activity.html">Activity</a></li>-->
-						<li><a href="/search_profile/search">Search</a>
-							<!--<ul>
-								<li><a href="search.html">Explore</a></li>
-								<li><a href="people.html">People</a></li>
-								<li><a href="gallery.html">Galleries</a></li>
-							</ul>-->
-						</li>
-						<% if session[:current_user_key] %>
-							<li><a href="/show_profile">My Profile</a></li>
-						<% end %>
-						<!--<li><a href="site-map.html">Site Map</a></li>-->
-						<!--<li><a href="organization.html">Organization</a></li>-->
-						<!--<li id="ad-work-li"><a id="add-work-btn" class="btn color-1" href="work.html">Add Work </a></li>-->
-					</ul>
-				</div>
-				<div class="login-header-block">
-					<div class="login_block">
-						<% if session[:current_user_key] %>
-						<%= link_to 'Log out', logout_path, method: :get, :class => "btn color-1 size-2 hover-2" %>
-						<!--<a class="btn color-1 size-2 hover-2" href="/login_info/logout" ><i class="fa fa-room"></i>-->
-						<!--Log out</a>-->
-						<% else %>
-						<%= link_to 'Log in', login_path, method: :post, :class => "btn btn-login color-1 size-2 hover-2" %>
-						<!--<a class="btn btn-login color-1 size-2 hover-2" href="/application/login" ><i class="fa fa-room"></i>-->
-						<!--Log in</a>-->
-						<% end %>
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-	</header>
+  	<%= render 'shared/header' %>
 	
 	
 	<!-- MAIN CONTENT -->
@@ -185,7 +137,9 @@
 													<form accept-charset="UTF-8">
 														<div class="col-sm-4">
 															<div class="form-group focus-2">
-																<label for="country">Country</label>
+																<%= form.label :country %>
+																<%= form.select :country, options_from_collection_for_select(@countries, 'name', 'name',  :selected => form.object.country), {:prompt => "Select Country"}, {class: "countries form-control", style: "color: black"} %>
+																<!--
 																<select name="general_info[country]" class="countries form-control" id="country" required style="color: black;" >
 																	<option value="">Select Country</option>
 																	<%#<% @countries.each do |country| %>
@@ -195,6 +149,7 @@
 																	<%#<% end %>
 																	<option value="">Select Country</option>
 																</select>
+																-->
 															</div>
 														</div>
 													</form>
@@ -202,13 +157,16 @@
 													<!- State and City>
 
 													<div class="col-sm-4">
-														<label for="state">State</label>
+														<%= form.label :state %>
+														<%= form.select :state, options_from_collection_for_select(@countries.find_by_name(form.object.country).states, 'name', 'name',  :selected => form.object.state), {:prompt => "Select State"}, {class: "states form-control", style: "color: black"} %>
+														<!--
 														<select name="general_info[state]" class="states form-control" id="state" required style="color: black;" >
 															<option value="">Select State</option>
 														</select>
+														-->
 													</div>
 													<div class="col-sm-4">
-														<label for="city">City</label>
+														<%= form.label :city %>
 														<%= form.text_field :city, id: "city", class: 'cities form-input', :type => 'text', required: true, style: "height: 35px;" %>
 														<%# <select name="general_info[city]" class="cities form-control" id="city" required style="color: black;" >
 															<option value="">Select City</option>

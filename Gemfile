@@ -5,12 +5,12 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-ruby '3.2.0' #ruby '2.7.5'
+ruby '3.2.2' #ruby '2.7.5'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.1.4.2'
 # Use postgresql as the database for Active Record
-gem 'pg'
+gem 'pg', '~> 1.5.6'
 # Use Puma as the app server
 gem 'puma'
 # Use SCSS for stylesheets
@@ -60,11 +60,11 @@ group :development, :test do
   gem 'cucumber-rails', :require => false
   # database_cleaner is not required, but highly recommended
   gem 'database_cleaner'
-
+  gem 'dotenv-rails'
   gem 'rspec-rails', '~> 6.0.0'
 
   gem 'capybara'
-  gem 'selenium-webdriver', '~> 4.4.0'
+  gem 'selenium-webdriver', '~> 4.8.0'
   # to debug using cucumber binding.pry
   gem 'pry'
   
